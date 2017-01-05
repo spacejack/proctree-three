@@ -89,14 +89,7 @@ function makeTreeGeo() {
 	const vertices = new Float32Array(Tree.flattenArray(tree.verts))
 	const normals = new Float32Array(Tree.flattenArray(tree.normals))
 	const uvs = new Float32Array(Tree.flattenArray(tree.UV))
-	const ids = new Uint32Array(tree.faces.length * 3)
-
-	for (let i = 0; i < tree.faces.length; i++) {
-		let face = tree.faces[i]
-		ids[i * 3 + 0] = face[0]
-		ids[i * 3 + 1] = face[1]
-		ids[i * 3 + 2] = face[2]
-	}
+	const ids = new Uint32Array(Tree.flattenArray(tree.faces))
 
 	const geo = new THREE.BufferGeometry()
 	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
