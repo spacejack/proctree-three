@@ -1,6 +1,4 @@
-// old demo source: http://jsfiddle.net/KY7eq/
-
-declare const Tree: any
+// depends on three.js and proctree.js
 
 let camera: THREE.Camera
 let scene: THREE.Scene
@@ -10,6 +8,7 @@ let mesh: THREE.Mesh
 function init() {
 	renderer = new THREE.WebGLRenderer()
 	renderer.setSize(window.innerWidth, window.innerHeight)
+	document.body.appendChild(renderer.domElement)
 
 	scene = new THREE.Scene()
 
@@ -32,7 +31,6 @@ function init() {
 		)
 		mesh.position.y = -3.25
 		scene.add(mesh)
-		document.body.appendChild(renderer.domElement)
 		animate()
 	})
 }
@@ -103,6 +101,7 @@ function makeTreeGeo() {
 	return geo
 }
 
+/** Animation loop */
 function animate() {
 	mesh.rotation.y = (Date.now() * 0.5 / 1000.0) % (Math.PI * 2.0)
 	renderer.render(scene, camera)

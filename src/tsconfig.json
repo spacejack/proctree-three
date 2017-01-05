@@ -15,6 +15,7 @@
     "noImplicitThis": true
   },
   "files": ["main.ts"],
+  "include": ["**/*.d.ts"],
   "compileOnSave": false,
   "buildOnSave": false,
   "atom": {
