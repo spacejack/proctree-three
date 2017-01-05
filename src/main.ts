@@ -21,44 +21,46 @@ function init() {
 	scene.add(ambient)
 
 	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1.0, 1000.0)
-	camera.position.z = 8.0
+	camera.position.z = 8.5
 	scene.add(camera)
 
-	const geo = makeTreeGeo()
-
-	mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({color: 0xBB7744}))
-	mesh.position.y = -2.5
-	scene.add(mesh)
-
-	document.body.appendChild(renderer.domElement)
+	const tex = new THREE.TextureLoader().load('tex/bark.jpg', () => {
+		tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+		mesh = new THREE.Mesh(
+			makeTreeGeo(),
+			new THREE.MeshLambertMaterial({color: 0xFFFFFF, map: tex})
+		)
+		mesh.position.y = -3.25
+		scene.add(mesh)
+		document.body.appendChild(renderer.domElement)
+		animate()
+	})
 }
 
 function makeTreeGeo() {
 	const tree = new Tree({
-		seed: 123,
+		seed: Math.round(Math.random() * 10000),
 		segments: 10,
 		levels: 5,
 		vMultiplier: 0.66,
 		twigScale: 0.47,
 		initalBranchLength: 0.5,
 		lengthFalloffFactor: 0.85,
-		lengthFalloffPower: 0.99,
+		lengthFalloffPower: 0.75,
 		clumpMax: 0.449,
 		clumpMin: 0.404,
-		branchFactor: 2.75,
-		dropAmount: 0.07,
+		branchFactor: 3,
+		dropAmount: 0.05,
 		growAmount: -0.005,
 		sweepAmount: 0.01,
-		maxRadius: 0.269,
-		climbRate: 0.626,
+		maxRadius: 0.27,
+		climbRate: 0.625,
 		trunkKink: 0.108,
 		treeSteps: 4,
-		taperRate: 0.876,
+		taperRate: 0.925,
 		radiusFalloffRate: 0.66,
 		twistRate: 2.7,
-		trunkLength: 1.55
-		//trunkMaterial: 'trunkMat',
-		//twigMaterial: 'twigMat'
+		trunkLength: 1.75
 	})
 
 	/*const tree = new Tree({
@@ -86,6 +88,8 @@ function makeTreeGeo() {
 		trunkLength: 2.4
 	})*/
 
+	console.log('tree:', tree)
+
 	const vertices = new Float32Array(Tree.flattenArray(tree.verts))
 	const normals = new Float32Array(Tree.flattenArray(tree.normals))
 	const uvs = new Float32Array(Tree.flattenArray(tree.UV))
@@ -100,17 +104,12 @@ function makeTreeGeo() {
 }
 
 function animate() {
-	requestAnimationFrame(animate)
-	render()
-}
-
-function render() {
-	mesh.rotation.y += 0.01
+	mesh.rotation.y = (Date.now() * 0.5 / 1000.0) % (Math.PI * 2.0)
 	renderer.render(scene, camera)
+	requestAnimationFrame(animate)
 }
 
 ///////////////////////////////////////////////////////////
-// Start
+// Startup
 
 init()
-animate()
