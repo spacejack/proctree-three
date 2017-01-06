@@ -3,7 +3,7 @@
 let camera: THREE.Camera
 let scene: THREE.Scene
 let renderer: THREE.WebGLRenderer
-let mesh: THREE.Mesh
+let obj: THREE.Object3D
 
 function init() {
 	renderer = new THREE.WebGLRenderer()
@@ -23,19 +23,6 @@ function init() {
 	camera.position.z = 8.5
 	scene.add(camera)
 
-	const tex = new THREE.TextureLoader().load('tex/bark.jpg', () => {
-		tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-		mesh = new THREE.Mesh(
-			makeTreeGeo(),
-			new THREE.MeshLambertMaterial({color: 0xFFFFFF, map: tex})
-		)
-		mesh.position.y = -3.25
-		scene.add(mesh)
-		animate()
-	})
-}
-
-function makeTreeGeo() {
 	const tree = new Tree({
 		seed: Math.round(Math.random() * 10000),
 		segments: 10,
@@ -61,33 +48,34 @@ function makeTreeGeo() {
 		trunkLength: 1.75
 	})
 
-	/*const tree = new Tree({
-		seed: 262,
-		segments: 6,
-		levels: 5,
-		vMultiplier: 2.36,
-		twigScale: 0.39,
-		initalBranchLength: 0.49,
-		lengthFalloffFactor: 0.85,
-		lengthFalloffPower: 0.99,
-		clumpMax: 0.454,
-		clumpMin: 0.404,
-		branchFactor: 2.45,
-		dropAmount: -0.1,
-		growAmount: 0.235,
-		sweepAmount: 0.01,
-		maxRadius: 0.139,
-		climbRate: 0.371,
-		trunkKink: 0.093,
-		treeSteps: 5,
-		taperRate: 0.947,
-		radiusFalloffRate: 0.73,
-		twistRate: 3.02,
-		trunkLength: 2.4
-	})*/
+	obj = new THREE.Object3D()
 
-	console.log('tree:', tree)
+	const barkTex = new THREE.TextureLoader().load('tex/bark.jpg', () => {
+		barkTex.wrapS = barkTex.wrapT = THREE.RepeatWrapping
+		const treeMesh = new THREE.Mesh(
+			makeTreeGeo(tree),
+			new THREE.MeshLambertMaterial({color: 0xFFFFFF, map: barkTex})
+		)
+		obj.add(treeMesh)
 
+		const twigTex = new THREE.TextureLoader().load('tex/twig.png', () => {
+			const twigMesh = new THREE.Mesh(
+				makeTwigGeo(tree),
+				new THREE.MeshLambertMaterial({
+					color: 0xFFFFFF, map: twigTex, transparent: true, alphaTest: 0.5
+				})
+			)
+			obj.add(twigMesh)
+
+			obj.position.y = -3.25
+			scene.add(obj)
+
+			animate()
+		})
+	})
+}
+
+function makeTreeGeo(tree: Tree) {
 	const vertices = new Float32Array(Tree.flattenArray(tree.verts))
 	const normals = new Float32Array(Tree.flattenArray(tree.normals))
 	const uvs = new Float32Array(Tree.flattenArray(tree.UV))
@@ -101,9 +89,23 @@ function makeTreeGeo() {
 	return geo
 }
 
+function makeTwigGeo(tree: Tree) {
+	const vertices = new Float32Array(Tree.flattenArray(tree.vertsTwig))
+	const normals = new Float32Array(Tree.flattenArray(tree.normalsTwig))
+	const uvs = new Float32Array(Tree.flattenArray(tree.uvsTwig))
+	const ids = new Uint32Array(Tree.flattenArray(tree.facesTwig))
+
+	const geo = new THREE.BufferGeometry()
+	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
+	geo.addAttribute('normal', new THREE.BufferAttribute(normals, 3, true))
+	geo.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
+	geo.setIndex(new THREE.BufferAttribute(ids, 1))
+	return geo
+}
+
 /** Animation loop */
 function animate() {
-	mesh.rotation.y = (Date.now() * 0.5 / 1000.0) % (Math.PI * 2.0)
+	obj.rotation.y = (Date.now() * 0.5 / 1000.0) % (Math.PI * 2.0)
 	renderer.render(scene, camera)
 	requestAnimationFrame(animate)
 }
