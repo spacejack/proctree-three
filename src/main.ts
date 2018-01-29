@@ -1,4 +1,8 @@
-// depends on three.js and proctree.js
+/// <reference path="typings/three-global.d.ts" />
+import Tree from './proctree'
+import {
+	flattenI3toUint32Array, flattenV2toFloat32Array, flattenV3toFloat32Array
+} from './util/array'
 
 let camera: THREE.Camera
 let scene: THREE.Scene
@@ -29,7 +33,7 @@ function init() {
 		levels: 5,
 		vMultiplier: 0.66,
 		twigScale: 0.47,
-		initalBranchLength: 0.5,
+		initialBranchLength: 0.5,
 		lengthFalloffFactor: 0.85,
 		lengthFalloffPower: 0.75,
 		clumpMax: 0.449,
@@ -47,6 +51,8 @@ function init() {
 		twistRate: 2.7,
 		trunkLength: 1.75
 	})
+
+	console.log('tree:', tree)
 
 	obj = new THREE.Object3D()
 
@@ -76,10 +82,10 @@ function init() {
 }
 
 function makeTreeGeo(tree: Tree) {
-	const vertices = new Float32Array(Tree.flattenArray(tree.verts))
-	const normals = new Float32Array(Tree.flattenArray(tree.normals))
-	const uvs = new Float32Array(Tree.flattenArray(tree.UV))
-	const ids = new Uint32Array(Tree.flattenArray(tree.faces))
+	const vertices = flattenV3toFloat32Array(tree.verts)
+	const normals = flattenV3toFloat32Array(tree.normals)
+	const uvs = flattenV2toFloat32Array(tree.UV)
+	const ids = flattenI3toUint32Array(tree.faces)
 
 	const geo = new THREE.BufferGeometry()
 	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
@@ -90,10 +96,10 @@ function makeTreeGeo(tree: Tree) {
 }
 
 function makeTwigGeo(tree: Tree) {
-	const vertices = new Float32Array(Tree.flattenArray(tree.vertsTwig))
-	const normals = new Float32Array(Tree.flattenArray(tree.normalsTwig))
-	const uvs = new Float32Array(Tree.flattenArray(tree.uvsTwig))
-	const ids = new Uint32Array(Tree.flattenArray(tree.facesTwig))
+	const vertices = flattenV3toFloat32Array(tree.vertsTwig)
+	const normals = flattenV3toFloat32Array(tree.normalsTwig)
+	const uvs = flattenV2toFloat32Array(tree.uvsTwig)
+	const ids = flattenI3toUint32Array(tree.facesTwig)
 
 	const geo = new THREE.BufferGeometry()
 	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
