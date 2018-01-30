@@ -132,7 +132,7 @@ export default class Tree {
 			for (let i = 0; i < segments; i++) {
 				const vec = axisAngle(V3.create(-1, 0, 0), axis, -segmentAngle * i)
 				branch.root.push(verts.length)
-				verts.push(V3.multScalar(V3.create(), vec, radius / this.properties.radiusFalloffRate))
+				verts.push(V3.scale(V3.create(), vec, radius / this.properties.radiusFalloffRate))
 			}
 		}
 
@@ -155,15 +155,15 @@ export default class Tree {
 					tangent,
 					V3.normalize(V3.create(),
 						V3.add(V3.create(),
-							V3.multScalar(V3.create(), axis1, -1),
-							V3.multScalar(V3.create(), axis2, -1)
+							V3.scale(V3.create(), axis1, -1),
+							V3.scale(V3.create(), axis2, -1)
 						)
 					)
 				)
 			)
 			const dir = V3.create(axis2.x, 0, axis2.z)
 			const centerloc = V3.add(V3.create(),
-				branch.head, V3.multScalar(V3.create(), dir, -this.properties.maxRadius / 2)
+				branch.head, V3.scale(V3.create(), dir, -this.properties.maxRadius / 2)
 			)
 
 			const ring0: number[] = branch.ring0 = []
@@ -179,7 +179,7 @@ export default class Tree {
 			const linch0 = verts.length
 			ring0.push(linch0)
 			ring2.push(linch0)
-			verts.push(V3.add(V3.create(), centerloc, V3.multScalar(V3.create(), tangent, radius * scale)))
+			verts.push(V3.add(V3.create(), centerloc, V3.scale(V3.create(), tangent, radius * scale)))
 
 			let start = verts.length - 1
 			const d1 = axisAngle(tangent, axis2, 1.57)
@@ -190,17 +190,17 @@ export default class Tree {
 				ring0.push(start + i)
 				ring2.push(start + i)
 				vec = scaleInDirection(vec, d2, s)
-				verts.push(V3.add(V3.create(), centerloc, V3.multScalar(V3.create(), vec, radius * scale)))
+				verts.push(V3.add(V3.create(), centerloc, V3.scale(V3.create(), vec, radius * scale)))
 			}
 			const linch1 = verts.length
 			ring0.push(linch1)
 			ring1.push(linch1)
-			verts.push(V3.add(V3.create(), centerloc, V3.multScalar(V3.create(), tangent, -radius * scale)))
+			verts.push(V3.add(V3.create(), centerloc, V3.scale(V3.create(), tangent, -radius * scale)))
 			for (let i = segments / 2 + 1; i < segments; i++) {
 				const vec = axisAngle(tangent, axis1, segmentAngle * i)
 				ring0.push(verts.length)
 				ring1.push(verts.length)
-				verts.push(V3.add(V3.create(), centerloc, V3.multScalar(V3.create(), vec, radius * scale)))
+				verts.push(V3.add(V3.create(), centerloc, V3.scale(V3.create(), vec, radius * scale)))
 			}
 			ring1.push(linch0)
 			ring2.push(linch1)
@@ -209,7 +209,7 @@ export default class Tree {
 				const vec = axisAngle(tangent, axis3, segmentAngle * i)
 				ring1.push(start + i)
 				ring2.push(start + (segments / 2 - i))
-				const v = V3.multScalar(V3.create(), vec, radius * scale)
+				const v = V3.scale(V3.create(), vec, radius * scale)
 				verts.push(V3.add(V3.create(), centerloc, v))
 			}
 
@@ -249,58 +249,58 @@ export default class Tree {
 			const vert1 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
 				)
 			)
 			const vert2 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, -this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, -this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
 				)
 			)
 			const vert3 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, -this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, -branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, -this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, -branch.length)
 				)
 			)
 			const vert4 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, -branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, -branch.length)
 				)
 			)
 
 			const vert8 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
 				)
 			)
 			const vert7 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, -this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, -this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, this.properties.twigScale * 2 - branch.length)
 				)
 			)
 			const vert6 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, -this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, -branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, -this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, -branch.length)
 				)
 			)
 			const vert5 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(V3.create(),
-					V3.add(V3.create(), branch.head, V3.multScalar(V3.create(), tangent, this.properties.twigScale)),
-					V3.multScalar(V3.create(), binormal, -branch.length)
+					V3.add(V3.create(), branch.head, V3.scale(V3.create(), tangent, this.properties.twigScale)),
+					V3.scale(V3.create(), binormal, -branch.length)
 				)
 			)
 
@@ -482,7 +482,7 @@ export default class Tree {
 			const total = V3.create(0, 0, 0)
 			const l = allNormals[i].length
 			for (let j = 0; j < l; j++) {
-				V3.add(total, total, V3.multScalar(V3.create(), allNormals[i][j] , 1 / l))
+				V3.add(total, total, V3.scale(V3.create(), allNormals[i][j] , 1 / l))
 			}
 			normals[i] = total
 		}
@@ -545,17 +545,17 @@ export class Branch {
 		const clumpmax = properties.clumpMax
 		const clumpmin = properties.clumpMin
 		const adj = V3.add(V3.create(),
-			V3.multScalar(V3.create(), normal, r),
-			V3.multScalar(V3.create(), tangent, 1 - r)
+			V3.scale(V3.create(), normal, r),
+			V3.scale(V3.create(), tangent, 1 - r)
 		)
 		if (r > 0.5) {
-			V3.multScalar(adj, adj, -1)
+			V3.scale(adj, adj, -1)
 		}
 
 		const clump = (clumpmax - clumpmin) * r + clumpmin
 		let newdir = V3.normalize(V3.create(),
 			V3.add(V3.create(),
-				V3.multScalar(V3.create(), adj, 1 - clump), V3.multScalar(V3.create(), dir, clump)
+				V3.scale(V3.create(), adj, 1 - clump), V3.scale(V3.create(), dir, clump)
 			)
 		)
 
@@ -586,8 +586,8 @@ export class Branch {
 			)
 		)
 
-		const head0 = V3.add(V3.create(), this.head, V3.multScalar(V3.create(), newdir, this.length))
-		const head1 = V3.add(V3.create(), this.head, V3.multScalar(V3.create(), newdir2, this.length))
+		const head0 = V3.add(V3.create(), this.head, V3.scale(V3.create(), newdir, this.length))
+		const head1 = V3.add(V3.create(), this.head, V3.scale(V3.create(), newdir2, this.length))
 		this.child0 = new Branch(head0, this)
 		this.child1 = new Branch(head1, this)
 		this.child0.length = Math.pow(this.length, properties.lengthFalloffPower) * properties.lengthFalloffFactor
@@ -622,15 +622,15 @@ function axisAngle (vec: V3, axis: V3, angle: number) {
 	const sinr = Math.sin(angle)
 	return V3.add(V3.create(),
 		V3.add(V3.create(),
-			V3.multScalar(V3.create(), vec, cosr),
-			V3.multScalar(V3.create(), V3.cross(V3.create(), axis, vec), sinr)
+			V3.scale(V3.create(), vec, cosr),
+			V3.scale(V3.create(), V3.cross(V3.create(), axis, vec), sinr)
 		),
-		V3.multScalar(V3.create(), axis, V3.dot(axis, vec) * (1 - cosr))
+		V3.scale(V3.create(), axis, V3.dot(axis, vec) * (1 - cosr))
 	)
 }
 
 function scaleInDirection (vector: V3, direction: V3, scale: number) {
 	const currentMag = V3.dot(vector, direction)
-	const change = V3.multScalar(V3.create(), direction, currentMag * scale - currentMag)
+	const change = V3.scale(V3.create(), direction, currentMag * scale - currentMag)
 	return V3.add(V3.create(), vector, change)
 }
