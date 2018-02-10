@@ -1,5 +1,4 @@
-// depends on three.js and proctree.js
-
+/// <reference path="./typings/proctree.d.ts"/>
 let camera: THREE.Camera
 let scene: THREE.Scene
 let renderer: THREE.WebGLRenderer
