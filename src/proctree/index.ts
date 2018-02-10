@@ -59,7 +59,7 @@ export default class Tree {
 	root: Branch
 	verts: V3[]
 	normals: V3[]
-	UV: V2[]
+	uv: V2[]
 	faces: [number, number, number][]
 	vertsTwig: V3[]
 	normalsTwig: V3[]
@@ -100,7 +100,7 @@ export default class Tree {
 		this.root.length = this.properties.initialBranchLength
 		this.verts = []
 		this.normals = []
-		this.UV = []
+		this.uv = []
 		this.faces = []
 		this.vertsTwig = []
 		this.normalsTwig = []
@@ -352,10 +352,10 @@ export default class Tree {
 		const segments = this.properties.segments
 		const faces = this.faces
 		const verts = this.verts
-		const UV = this.UV
+		const uv = this.uv
 		if (!branch.parent) {
 			for (let i = 0; i < verts.length; i++) {
-				UV[i] = V2.create(0, 0)
+				uv[i] = V2.create(0, 0)
 			}
 			const tangent = V3.normalize(V3.create(),
 				V3.cross(V3.create(),
@@ -377,12 +377,12 @@ export default class Tree {
 
 				faces.push([v1, v4, v3])
 				faces.push([v4, v2, v3])
-				UV[(i + segOffset) % segments] = V2.create(Math.abs(i / segments - 0.5) * 2, 0)
+				uv[(i + segOffset) % segments] = V2.create(Math.abs(i / segments - 0.5) * 2, 0)
 				const len = V3.length(
 					V3.sub(V3.create(), verts[branch.ring0![i]], verts[branch.root[(i + segOffset) % segments]])
 				) * this.properties.vMultiplier
-				UV[branch.ring0![i]] = V2.create(Math.abs(i / segments - 0.5) * 2, len)
-				UV[branch.ring2![i]] = V2.create(Math.abs(i / segments - 0.5) * 2, len)
+				uv[branch.ring0![i]] = V2.create(Math.abs(i / segments - 0.5) * 2, len)
+				uv[branch.ring2![i]] = V2.create(Math.abs(i / segments - 0.5) * 2, len)
 			}
 		}
 
@@ -411,37 +411,37 @@ export default class Tree {
 				}
 			}
 
-			const UVScale = this.properties.maxRadius / branch.radius
+			const uvScale = this.properties.maxRadius / branch.radius
 
 			for (let i = 0; i < segments; i++) {
-				let v1 = branch.child0!.ring0![i]
-				let v2 = branch.ring1![(i + segOffset0! + 1) % segments]
-				let v3 = branch.ring1![(i + segOffset0!) % segments]
-				let v4 = branch.child0!.ring0![(i + 1) % segments]
-				faces.push([v1, v4, v3])
-				faces.push([v4, v2, v3])
-				v1 = branch.child1!.ring0![i]
-				v2 = branch.ring2![(i + segOffset1! + 1) % segments]
-				v3 = branch.ring2![(i + segOffset1!) % segments]
-				v4 = branch.child1!.ring0![(i + 1) % segments]
-				faces.push([v1, v2, v3])
-				faces.push([v1, v4, v2])
+				let i1 = branch.child0!.ring0![i]
+				let i2 = branch.ring1![(i + segOffset0! + 1) % segments]
+				let i3 = branch.ring1![(i + segOffset0!) % segments]
+				let i4 = branch.child0!.ring0![(i + 1) % segments]
+				faces.push([i1, i4, i3])
+				faces.push([i4, i2, i3])
+				i1 = branch.child1!.ring0![i]
+				i2 = branch.ring2![(i + segOffset1! + 1) % segments]
+				i3 = branch.ring2![(i + segOffset1!) % segments]
+				i4 = branch.child1!.ring0![(i + 1) % segments]
+				faces.push([i1, i2, i3])
+				faces.push([i1, i4, i2])
 
 				const len1 = V3.length(
 					V3.sub(V3.create(), verts[branch.child0!.ring0![i]], verts[branch.ring1![(i + segOffset0!) % segments]])
-				) * UVScale
-				const uv1 = UV[branch.ring1![(i + segOffset0! - 1) % segments]]
+				) * uvScale
+				const uv1 = uv[branch.ring1![(i + segOffset0! - 1) % segments]]
 
-				UV[branch.child0!.ring0![i]] = V2.create(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
-				UV[branch.child0!.ring2![i]] = V2.create(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
+				uv[branch.child0!.ring0![i]] = V2.create(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
+				uv[branch.child0!.ring2![i]] = V2.create(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
 
 				const len2 = V3.length(
 					V3.sub(V3.create(), verts[branch.child1!.ring0![i]], verts[branch.ring2![(i + segOffset1!) % segments]])
-				) * UVScale
-				const uv2 = UV[branch.ring2![(i + segOffset1! - 1) % segments]]
+				) * uvScale
+				const uv2 = uv[branch.ring2![(i + segOffset1! - 1) % segments]]
 
-				UV[branch.child1!.ring0![i]] = V2.create(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
-				UV[branch.child1!.ring2![i]] = V2.create(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
+				uv[branch.child1!.ring0![i]] = V2.create(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
+				uv[branch.child1!.ring2![i]] = V2.create(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
 			}
 
 			this.doFaces(branch.child0)
@@ -451,9 +451,9 @@ export default class Tree {
 				faces.push([branch.child0!.end,branch.ring1![(i + 1) % segments], branch.ring1![i]])
 				faces.push([branch.child1!.end,branch.ring2![(i + 1) % segments], branch.ring2![i]])
 				let len = V3.length(V3.sub(V3.create(), verts[branch.child0!.end], verts[branch.ring1![i]]))
-				UV[branch.child0!.end] = V2.create(Math.abs(i / segments - 1 - 0.5) * 2, len * this.properties.vMultiplier)
+				uv[branch.child0!.end] = V2.create(Math.abs(i / segments - 1 - 0.5) * 2, len * this.properties.vMultiplier)
 				len = V3.length(V3.sub(V3.create(), verts[branch.child1!.end],verts[branch.ring2![i]]))
-				UV[branch.child1!.end] = V2.create(Math.abs(i / segments - 0.5) * 2, len * this.properties.vMultiplier)
+				uv[branch.child1!.end] = V2.create(Math.abs(i / segments - 0.5) * 2, len * this.properties.vMultiplier)
 			}
 		}
 	}

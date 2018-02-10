@@ -84,7 +84,7 @@ function init() {
 function makeTreeGeo(tree: Tree) {
 	const vertices = flattenV3toFloat32Array(tree.verts)
 	const normals = flattenV3toFloat32Array(tree.normals)
-	const uvs = flattenV2toFloat32Array(tree.UV)
+	const uvs = flattenV2toFloat32Array(tree.uv)
 	const ids = flattenI3toUint32Array(tree.faces)
 
 	const geo = new THREE.BufferGeometry()
