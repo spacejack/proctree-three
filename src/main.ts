@@ -1,4 +1,9 @@
+/// <reference path="./typings/three-global.d.ts"/>
 /// <reference path="./typings/proctree.d.ts"/>
+import {
+	flattenA2toFloat32Array, flattenA3toFloat32Array, flattenA3toUint32Array
+} from './lib/array'
+
 let camera: THREE.Camera
 let scene: THREE.Scene
 let renderer: THREE.WebGLRenderer
@@ -22,13 +27,13 @@ function init() {
 	camera.position.z = 8.5
 	scene.add(camera)
 
-	const tree = new Tree({
+	const tree = new ProcTree({
 		seed: Math.round(Math.random() * 10000),
 		segments: 10,
 		levels: 5,
 		vMultiplier: 0.66,
 		twigScale: 0.47,
-		initalBranchLength: 0.5,
+		initialBranchLength: 0.5,
 		lengthFalloffFactor: 0.85,
 		lengthFalloffPower: 0.75,
 		clumpMax: 0.449,
@@ -74,11 +79,11 @@ function init() {
 	})
 }
 
-function makeTreeGeo(tree: Tree) {
-	const vertices = new Float32Array(Tree.flattenArray(tree.verts))
-	const normals = new Float32Array(Tree.flattenArray(tree.normals))
-	const uvs = new Float32Array(Tree.flattenArray(tree.UV))
-	const ids = new Uint32Array(Tree.flattenArray(tree.faces))
+function makeTreeGeo(tree: ProcTree) {
+	const vertices = flattenA3toFloat32Array(tree.verts)
+	const normals = flattenA3toFloat32Array(tree.normals)
+	const uvs = flattenA2toFloat32Array(tree.UV)
+	const ids = flattenA3toUint32Array(tree.faces)
 
 	const geo = new THREE.BufferGeometry()
 	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
@@ -88,11 +93,11 @@ function makeTreeGeo(tree: Tree) {
 	return geo
 }
 
-function makeTwigGeo(tree: Tree) {
-	const vertices = new Float32Array(Tree.flattenArray(tree.vertsTwig))
-	const normals = new Float32Array(Tree.flattenArray(tree.normalsTwig))
-	const uvs = new Float32Array(Tree.flattenArray(tree.uvsTwig))
-	const ids = new Uint32Array(Tree.flattenArray(tree.facesTwig))
+function makeTwigGeo(tree: ProcTree) {
+	const vertices = flattenA3toFloat32Array(tree.vertsTwig)
+	const normals = flattenA3toFloat32Array(tree.normalsTwig)
+	const uvs = flattenA2toFloat32Array(tree.uvsTwig)
+	const ids = flattenA3toUint32Array(tree.facesTwig)
 
 	const geo = new THREE.BufferGeometry()
 	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))

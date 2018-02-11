@@ -26,6 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 (function(window){
+	"use strict";
     var Tree=function(data){
 		for(var i in data){
 			if(this.properties[i]!==undefined){
@@ -34,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}
 		this.properties.rseed=this.properties.seed;
 		this.root=new Branch([0,this.properties.trunkLength,0]);
-		this.root.length=this.properties.initalBranchLength;
+		this.root.length=this.properties.initialBranchLength;
 		this.verts=[];
 		this.faces=[];
 		this.normals=[];
@@ -48,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		this.createTwigs();
 		this.doFaces();
 		this.calcNormals();
-		
+
 	};
 	Tree.prototype.properties={
 		clumpMax:0.8,
@@ -66,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		segments:6,
 		levels:3,
 		sweepAmount:0,
-		initalBranchLength:0.85,
+		initialBranchLength:0.85,
 		trunkLength:2.5,
 		dropAmount: 0.0,
 		growAmount: 0.0,
@@ -91,7 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}
 		for(i=0;i<faces.length;i++){
 			var face=faces[i];
-			var norm=normalize(cross(subVec(verts[face[1]],verts[face[2]]),subVec(verts[face[1]],verts[face[0]])));		
+			var norm=normalize(cross(subVec(verts[face[1]],verts[face[2]]),subVec(verts[face[1]],verts[face[0]])));
 			allNormals[face[0]].push(norm);
 			allNormals[face[1]].push(norm);
 			allNormals[face[2]].push(norm);
@@ -121,12 +122,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			var angle=Math.acos(dot(tangent,[-1,0,0]));
 			if(dot(cross([-1,0,0],tangent),normal)>0) angle=2*Math.PI-angle;
 			var segOffset=Math.round((angle/Math.PI/2*segments));
-			for(var i=0;i<segments;i++){			
+			for(var i=0;i<segments;i++){
 				var v1=branch.ring0[i];
 				var v2=branch.root[(i+segOffset+1)%segments];
 				var v3=branch.root[(i+segOffset)%segments];
 				var v4=branch.ring0[(i+1)%segments];
-				
+
 				faces.push([v1,v4,v3]);
 				faces.push([v4,v2,v3]);
 				UV[(i+segOffset)%segments]=[Math.abs(i/segments-0.5)*2,0];
@@ -135,17 +136,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				UV[branch.ring2[i]]=[Math.abs(i/segments-0.5)*2,len];
 			}
 		}
-		
+
 		if(branch.child0.ring0){
 			var segOffset0,segOffset1;
 			var match0,match1;
-			
+
 			var v1=normalize(subVec(verts[branch.ring1[0]],branch.head));
 			var v2=normalize(subVec(verts[branch.ring2[0]],branch.head));
-			
+
 			v1=scaleInDirection(v1,normalize(subVec(branch.child0.head,branch.head)),0);
 			v2=scaleInDirection(v2,normalize(subVec(branch.child1.head,branch.head)),0);
-			
+
 			for(i=0;i<segments;i++){
 				var d=normalize(subVec(verts[branch.child0.ring0[i]],branch.child0.head));
 				var l=dot(d,v1);
@@ -160,10 +161,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					segOffset1=segments-i;
 				}
 			}
-			
-			var UVScale=this.properties.maxRadius/branch.radius;			
 
-			
+			var UVScale=this.properties.maxRadius/branch.radius;
+
+
 			for(i=0;i<segments;i++){
 				v1=branch.child0.ring0[i];
 				v2=branch.ring1[(i+segOffset0+1)%segments];
@@ -177,16 +178,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				v4=branch.child1.ring0[(i+1)%segments];
 				faces.push([v1,v2,v3]);
 				faces.push([v1,v4,v2]);
-				
+
 				var len1=length(subVec(verts[branch.child0.ring0[i]],verts[branch.ring1[(i+segOffset0)%segments]]))*UVScale;
 				var uv1=UV[branch.ring1[(i+segOffset0-1)%segments]];
-				
+
 				UV[branch.child0.ring0[i]]=[uv1[0],uv1[1]+len1*this.properties.vMultiplier];
 				UV[branch.child0.ring2[i]]=[uv1[0],uv1[1]+len1*this.properties.vMultiplier];
-				
+
 				var len2=length(subVec(verts[branch.child1.ring0[i]],verts[branch.ring2[(i+segOffset1)%segments]]))*UVScale;
 				var uv2=UV[branch.ring2[(i+segOffset1-1)%segments]];
-				
+
 				UV[branch.child1.ring0[i]]=[uv2[0],uv2[1]+len2*this.properties.vMultiplier];
 				UV[branch.child1.ring2[i]]=[uv2[0],uv2[1]+len2*this.properties.vMultiplier];
 			}
@@ -197,8 +198,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			for(var i=0;i<segments;i++){
 				faces.push([branch.child0.end,branch.ring1[(i+1)%segments],branch.ring1[i]]);
 				faces.push([branch.child1.end,branch.ring2[(i+1)%segments],branch.ring2[i]]);
-				
-				
+
+
 				var len=length(subVec(verts[branch.child0.end],verts[branch.ring1[i]]));
 				UV[branch.child0.end]=[Math.abs(i/segments-1-0.5)*2,len*this.properties.vMultiplier];
 				var len=length(subVec(verts[branch.child1.end],verts[branch.ring2[i]]));
@@ -206,7 +207,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			}
 		}
 	};
-	
+
 	Tree.prototype.createTwigs=function(branch){
 		if(!branch) branch=this.root;
 		var vertsTwig=this.vertsTwig;
@@ -216,8 +217,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		if(!branch.child0){
 			var tangent=normalize(cross(subVec(branch.parent.child0.head,branch.parent.head),subVec(branch.parent.child1.head,branch.parent.head)));
 			var binormal=normalize(subVec(branch.head,branch.parent.head));
-			var normal=cross(tangent,binormal);				
-			
+			var normal=cross(tangent,binormal);
+
 			var vert1=vertsTwig.length;
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,this.properties.twigScale)),scaleVec(binormal,this.properties.twigScale*2-branch.length)));
 			var vert2=vertsTwig.length;
@@ -226,7 +227,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,-this.properties.twigScale)),scaleVec(binormal,-branch.length)));
 			var vert4=vertsTwig.length;
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,this.properties.twigScale)),scaleVec(binormal,-branch.length)));
-			
+
 			var vert8=vertsTwig.length;
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,this.properties.twigScale)),scaleVec(binormal,this.properties.twigScale*2-branch.length)));
 			var vert7=vertsTwig.length;
@@ -235,31 +236,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,-this.properties.twigScale)),scaleVec(binormal,-branch.length)));
 			var vert5=vertsTwig.length;
 			vertsTwig.push(addVec(addVec(branch.head,scaleVec(tangent,this.properties.twigScale)),scaleVec(binormal,-branch.length)));
-			
+
 			facesTwig.push([vert1,vert2,vert3]);
 			facesTwig.push([vert4,vert1,vert3]);
-			
+
 			facesTwig.push([vert6,vert7,vert8]);
 			facesTwig.push([vert6,vert8,vert5]);
-			
+
 			normal=normalize(cross(subVec(vertsTwig[vert1],vertsTwig[vert3]),subVec(vertsTwig[vert2],vertsTwig[vert3])));
 			var normal2=normalize(cross(subVec(vertsTwig[vert7],vertsTwig[vert6]),subVec(vertsTwig[vert8],vertsTwig[vert6])));
-			
+
 			normalsTwig.push(normal);
 			normalsTwig.push(normal);
 			normalsTwig.push(normal);
 			normalsTwig.push(normal);
-			
+
 			normalsTwig.push(normal2);
 			normalsTwig.push(normal2);
 			normalsTwig.push(normal2);
 			normalsTwig.push(normal2);
-			
+
 			uvsTwig.push([0,1]);
 			uvsTwig.push([1,1]);
 			uvsTwig.push([1,0]);
 			uvsTwig.push([0,0]);
-			
+
 			uvsTwig.push([0,1]);
 			uvsTwig.push([1,1]);
 			uvsTwig.push([1,0]);
@@ -273,17 +274,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	Tree.prototype.createForks=function(branch,radius){
 		if(!branch) branch=this.root;
 		if(!radius) radius=this.properties.maxRadius;
-		
-		
+
+
 		branch.radius=radius;
-		
+
 		if(radius>branch.length) radius=branch.length;
-		
+
 		var verts=this.verts;
 		var segments=this.properties.segments;
-		
+
 		var segmentAngle=Math.PI*2/segments;
-			
+
 		if(!branch.parent){
 			//create the root of the tree
 			branch.root=[];
@@ -294,7 +295,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				verts.push(scaleVec(vec,radius/this.properties.radiusFalloffRate));
 			}
 		}
-		
+
 		//cross the branches to get the left
 		//add the branches to get the up
 		if(branch.child0){
@@ -303,14 +304,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			}else{
 				var axis=normalize(branch.head);
 			}
-			
+
 			var axis1=normalize(subVec(branch.head,branch.child0.head));
 			var axis2=normalize(subVec(branch.head,branch.child1.head));
 			var tangent=normalize(cross(axis1,axis2));
 			branch.tangent=tangent;
-			
+
 			var axis3=normalize(cross(tangent,normalize(addVec(scaleVec(axis1,-1),scaleVec(axis2,-1)))));
-			var dir=[axis2[0],0,axis2[2]];			
+			var dir=[axis2[0],0,axis2[2]];
 			var centerloc=addVec(branch.head,scaleVec(dir,-this.properties.maxRadius/2));
 
 
@@ -318,20 +319,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			var ring0=branch.ring0=[];
 			var ring1=branch.ring1=[];
 			var ring2=branch.ring2=[];
-			
+
 			var scale=this.properties.radiusFalloffRate;
-			
+
 			if(branch.child0.type=="trunk" || branch.type=="trunk") {
 				scale=1/this.properties.taperRate;
 			}
-			
+
 			//main segment ring
 			var linch0=verts.length;
 			ring0.push(linch0);
 			ring2.push(linch0);
 			verts.push(addVec(centerloc,scaleVec(tangent,radius*scale)));
-			
-			var start=verts.length-1;			
+
+			var start=verts.length-1;
 			var d1=vecAxisAngle(tangent,axis2,1.57);
 			var d2=normalize(cross(tangent,axis));
 			var s=1/dot(d1,d2);
@@ -363,11 +364,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var v=scaleVec(vec,radius*scale);
 				verts.push(addVec(centerloc,v));
 			}
-			
+
 			//child radius is related to the brans direction and the length of the branch
 			var length0=length(subVec(branch.head,branch.child0.head));
 			var length1=length(subVec(branch.head,branch.child1.head));
-			
+
 			var radius0=1*radius*this.properties.radiusFalloffRate;
 			var radius1=1*radius*this.properties.radiusFalloffRate;
 			if(branch.child0.type=="trunk") radius0=radius*this.properties.taperRate;
@@ -378,9 +379,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			branch.end=verts.length;
 			//branch.head=addVec(branch.head,scaleVec([this.properties.xBias,this.properties.yBias,this.properties.zBias],branch.length*3));
 			verts.push(branch.head);
-			
+
 		}
-		
+
 	};
 
 	var Branch=function(head,parent){
@@ -419,14 +420,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		var r2=properties.random(rLevel*10+l1*5+l2+1+properties.seed);
 		var clumpmax=properties.clumpMax;
 		var clumpmin=properties.clumpMin;
-		
+
 		var adj=addVec(scaleVec(normal,r),scaleVec(tangent,1-r));
 		if(r>0.5) adj=scaleVec(adj,-1);
-		
+
 		var clump=(clumpmax-clumpmin)*r+clumpmin
 		var newdir=normalize(addVec(scaleVec(adj,1-clump),scaleVec(dir,clump)));
-			
-		
+
+
 		var newdir2=this.mirrorBranch(newdir,dir,properties);
 		if(r>0.5){
 			var tmp=newdir;
@@ -437,13 +438,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			var angle=steps/properties.treeSteps*2*Math.PI*properties.twistRate;
 			newdir2=normalize([Math.sin(angle),r,Math.cos(angle)]);
 		}
-		
+
 		var growAmount=level*level/(properties.levels*properties.levels)*properties.growAmount;
 		var dropAmount=rLevel*properties.dropAmount
 		var sweepAmount=rLevel*properties.sweepAmount;
 		newdir=normalize(addVec(newdir,[sweepAmount,dropAmount+growAmount,0]));
 		newdir2=normalize(addVec(newdir2,[sweepAmount,dropAmount+growAmount,0]));
-		
+
 		var head0=addVec(so,scaleVec(newdir,this.length));
 		var head1=addVec(so,scaleVec(newdir2,this.length));
 		this.child0=new Branch(head0,this);
@@ -493,14 +494,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		var sinr=Math.sin(angle);
 		return addVec(addVec(scaleVec(vec,cosr),scaleVec(cross(axis,vec),sinr)),scaleVec(axis,dot(axis,vec)*(1-cosr)));
 	};
-	
+
 	var scaleInDirection=function(vector,direction,scale){
 		var currentMag=dot(vector,direction);
-		
+
 		var change=scaleVec(direction,currentMag*scale-currentMag);
 		return addVec(vector,change);
 	};
-	
+
     Tree.flattenArray=function(input){
         var retArray=[];
     	for(var i=0;i<input.length;i++){
@@ -510,6 +511,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     	}
     	return retArray;
     }
-    
-	window.Tree=Tree;
+
+	window.ProcTree=Tree;
 })(window);

@@ -1,4 +1,4 @@
-declare interface TreeOptions {
+declare interface ProcTreeOptions {
 	clumpMax?: number;
 	clumpMin?: number;
 	lengthFalloffFactor?: number;
@@ -14,7 +14,7 @@ declare interface TreeOptions {
 	segments?: number;
 	levels?: number;
 	sweepAmount?: number;
-	initalBranchLength?: number;
+	initialBranchLength?: number;
 	trunkLength?: number;
 	dropAmount?:  number;
 	growAmount?:  number;
@@ -23,8 +23,8 @@ declare interface TreeOptions {
 	seed?: number;
 }
 
-declare class Tree {
-	constructor (options: TreeOptions);
+declare class ProcTree {
+	constructor (options: ProcTreeOptions);
 	root: any;
 	verts: number[][];
 	vertsTwig: number[][];
