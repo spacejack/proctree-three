@@ -27,7 +27,7 @@ function init() {
 	camera.position.z = 8.5
 	scene.add(camera)
 
-	const tree = new Tree({
+	const tree: Tree = new (Tree as any)({
 		seed: Math.round(Math.random() * 10000),
 		segments: 10,
 		levels: 5,
@@ -84,7 +84,7 @@ function init() {
 function makeTreeGeo(tree: Tree) {
 	const vertices = flattenV3toFloat32Array(tree.verts)
 	const normals = flattenV3toFloat32Array(tree.normals)
-	const uvs = flattenV2toFloat32Array(tree.uv)
+	const uvs = flattenV2toFloat32Array(tree.UV)
 	const ids = flattenI3toUint32Array(tree.faces)
 
 	const geo = new THREE.BufferGeometry()
