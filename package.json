@@ -13,6 +13,9 @@
     "clean": "rm -f public/js/app.js",
     "start": "npm-run-all -p watch serve"
   },
+  "dependencies": {
+    "vec": "git+https://github.com/spacejack/vec.git"
+  },
   "devDependencies": {
     "@types/three": "0.89.6",
     "browserify": "^16.0.0",

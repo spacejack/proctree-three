@@ -1,8 +1,5 @@
 /// <reference path="./typings/three-global.d.ts"/>
-/// <reference path="./typings/proctree.d.ts"/>
-import {
-	flattenA2toFloat32Array, flattenA3toFloat32Array, flattenA3toUint32Array
-} from './lib/array'
+import {Tree, createTree} from './lib/tree'
 
 let camera: THREE.Camera
 let scene: THREE.Scene
@@ -27,7 +24,7 @@ function init() {
 	camera.position.z = 8.5
 	scene.add(camera)
 
-	const tree = new ProcTree({
+	const tree = createTree({
 		seed: Math.round(Math.random() * 10000),
 		segments: 10,
 		levels: 5,
@@ -51,6 +48,8 @@ function init() {
 		twistRate: 2.7,
 		trunkLength: 1.75
 	})
+
+	console.log('tree:', tree)
 
 	obj = new THREE.Object3D()
 
@@ -79,31 +78,21 @@ function init() {
 	})
 }
 
-function makeTreeGeo(tree: ProcTree) {
-	const vertices = flattenA3toFloat32Array(tree.verts)
-	const normals = flattenA3toFloat32Array(tree.normals)
-	const uvs = flattenA2toFloat32Array(tree.UV)
-	const ids = flattenA3toUint32Array(tree.faces)
-
+function makeTreeGeo(tree: Tree) {
 	const geo = new THREE.BufferGeometry()
-	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
-	geo.addAttribute('normal', new THREE.BufferAttribute(normals, 3, true))
-	geo.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
-	geo.setIndex(new THREE.BufferAttribute(ids, 1))
+	geo.addAttribute('position', new THREE.BufferAttribute(tree.position, 3))
+	geo.addAttribute('normal', new THREE.BufferAttribute(tree.normal, 3, true))
+	geo.addAttribute('uv', new THREE.BufferAttribute(tree.uv, 2))
+	geo.setIndex(new THREE.BufferAttribute(tree.id, 1))
 	return geo
 }
 
-function makeTwigGeo(tree: ProcTree) {
-	const vertices = flattenA3toFloat32Array(tree.vertsTwig)
-	const normals = flattenA3toFloat32Array(tree.normalsTwig)
-	const uvs = flattenA2toFloat32Array(tree.uvsTwig)
-	const ids = flattenA3toUint32Array(tree.facesTwig)
-
+function makeTwigGeo(tree: Tree) {
 	const geo = new THREE.BufferGeometry()
-	geo.addAttribute('position', new THREE.BufferAttribute(vertices, 3))
-	geo.addAttribute('normal', new THREE.BufferAttribute(normals, 3, true))
-	geo.addAttribute('uv', new THREE.BufferAttribute(uvs, 2))
-	geo.setIndex(new THREE.BufferAttribute(ids, 1))
+	geo.addAttribute('position', new THREE.BufferAttribute(tree.twigPosition, 3))
+	geo.addAttribute('normal', new THREE.BufferAttribute(tree.twigNormal, 3, true))
+	geo.addAttribute('uv', new THREE.BufferAttribute(tree.twigUv, 2))
+	geo.setIndex(new THREE.BufferAttribute(tree.twigId, 1))
 	return geo
 }
 

@@ -8,7 +8,7 @@ declare interface ProcTreeBranch {
 	child0?: ProcTreeBranch;
 	child1?: ProcTreeBranch;
 	type?: 'trunk';
-	tangent: number[];
+	tangent?: number[];
 	length: number;
 	radius: number;
 	end: number;
