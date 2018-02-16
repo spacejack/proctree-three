@@ -1,97 +1,4 @@
-export interface TreeProperties {
-	clumpMax: number
-	clumpMin: number
-	lengthFalloffFactor: number
-	lengthFalloffPower: number
-	branchFactor: number
-	radiusFalloffRate: number
-	climbRate: number
-	trunkKink: number
-	maxRadius: number
-	treeSteps: number
-	taperRate: number
-	twistRate: number
-	segments: number
-	levels: number
-	sweepAmount: number
-	initialBranchLength: number
-	trunkLength: number
-	dropAmount:  number
-	growAmount:  number
-	vMultiplier: number
-	twigScale: number
-	seed: number
-	rseed: number
-}
-
-export interface TreeOptions {
-	clumpMax?: number
-	clumpMin?: number
-	lengthFalloffFactor?: number
-	lengthFalloffPower?: number
-	branchFactor?: number
-	radiusFalloffRate?: number
-	climbRate?: number
-	trunkKink?: number
-	maxRadius?: number
-	treeSteps?: number
-	taperRate?: number
-	twistRate?: number
-	segments?: number
-	levels?: number
-	sweepAmount?: number
-	initialBranchLength?: number
-	trunkLength?: number
-	dropAmount?:  number
-	growAmount?:  number
-	vMultiplier?: number
-	twigScale?: number
-	seed?: number
-}
-
-interface Tree {
-	properties: TreeProperties
-	root: Branch
-	verts: V3[]
-	normals: V3[]
-	UV: V2[]
-	faces: number[][]
-	vertsTwig: V3[]
-	normalsTwig: V3[]
-	uvsTwig: V2[]
-	facesTwig: number[][]
-	new(options: TreeOptions): Tree
-	createForks(branch: Branch, radius: number): void
-	createTwigs(branch?: Branch): void
-	doFaces(branch?: Branch): void
-	calcNormals(): void
-}
-
-function Tree (this: any, data: TreeOptions) {
-	for (let i in data) {
-		if (this.properties[i] !== undefined) {
-			this.properties[i] = (data as any)[i]
-		}
-	}
-	this.properties.rseed = this.properties.seed
-	this.root = new (Branch as any)(V3(0, this.properties.trunkLength, 0))
-	this.root.length = this.properties.initialBranchLength
-	this.verts = []
-	this.faces = []
-	this.normals = []
-	this.UV = []
-	this.vertsTwig = []
-	this.normalsTwig = []
-	this.facesTwig = []
-	this.uvsTwig = []
-	this.root.split(undefined, undefined, this.properties, undefined, undefined)
-	this.createForks()
-	this.createTwigs()
-	this.doFaces()
-	this.calcNormals()
-}
-
-Tree.prototype.properties = {
+export const defaults = {
 	clumpMax: 0.8,
 	clumpMin: 0.5,
 	lengthFalloffFactor: 0.85,
@@ -113,14 +20,48 @@ Tree.prototype.properties = {
 	growAmount: 0.0,
 	vMultiplier: 0.2,
 	twigScale: 2.0,
-	seed: 10,
-	rseed: 10
-	/* random: function(a?: number) {
-		if(!a) {
-			a = this.rseed++
-		}
-		return Math.abs(Math.cos(a+a*a))
-	} */
+	seed: 10
+}
+
+export type TreeOptions = Partial<typeof defaults>
+export type TreeProperties = typeof defaults & {rseed: number}
+
+interface Tree {
+	properties: TreeProperties
+	root: Branch
+	verts: V3[]
+	normals: V3[]
+	UV: V2[]
+	faces: number[][]
+	vertsTwig: V3[]
+	normalsTwig: V3[]
+	uvsTwig: V2[]
+	facesTwig: number[][]
+	new(options: TreeOptions): Tree
+	createForks(branch: Branch, radius: number): void
+	createTwigs(branch?: Branch): void
+	doFaces(branch?: Branch): void
+	calcNormals(): void
+}
+
+function Tree (this: any, data: TreeOptions = {}) {
+	this.properties = Object.assign({}, defaults, data)
+	this.properties.rseed = this.properties.seed
+	this.root = new (Branch as any)(V3(0, this.properties.trunkLength, 0))
+	this.root.length = this.properties.initialBranchLength
+	this.verts = []
+	this.faces = []
+	this.normals = []
+	this.UV = []
+	this.vertsTwig = []
+	this.normalsTwig = []
+	this.facesTwig = []
+	this.uvsTwig = []
+	this.root.split(undefined, undefined, this.properties, undefined, undefined)
+	this.createForks()
+	this.createTwigs()
+	this.doFaces()
+	this.calcNormals()
 }
 
 Tree.prototype.calcNormals = function (this: Tree) {
