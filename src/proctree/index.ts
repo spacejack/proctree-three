@@ -575,7 +575,7 @@ function V3 (x = 0, y = 0, z = 0) {
 
 namespace V3 {
 	export function dot (v1: V3, v2: V3){
-		return v1.x * v2.x + v1.y * v2.y + v1.x * v2.z
+		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 	}
 
 	export function cross (v1: V3, v2: V3) {
