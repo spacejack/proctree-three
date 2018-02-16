@@ -56,13 +56,10 @@ class Tree {
 		this.createForks()
 		this.createTwigs()
 		this.doFaces()
-		this.calcNormals()
+		Tree.calcNormals(this.normals, this.verts, this.faces)
 	}
 
-	calcNormals() {
-		const normals = this.normals
-		const faces = this.faces
-		const verts = this.verts
+	static calcNormals (normals: V3[], verts: V3[], faces: number[][]) {
 		const allNormals: V3[][] = []
 		for (let i = 0; i < verts.length; i++) {
 			allNormals[i] = []
@@ -87,6 +84,7 @@ class Tree {
 			}
 			normals[i] = total
 		}
+		return normals
 	}
 
 	doFaces (branch?: Branch) {
@@ -462,9 +460,9 @@ class Branch {
 		this.radius = 0
 	}
 
-	static mirror (vec: V3, norm: V3, properties: TreeProperties) {
+	static mirror (vec: V3, norm: V3, branchFactor: number) {
 		const v = V3.cross(norm, V3.cross(vec, norm))
-		const s = properties.branchFactor * V3.dot(v, vec)
+		const s = branchFactor * V3.dot(v, vec)
 		return V3(vec.x - v.x * s, vec.y - v.y * s, vec.z - v.z * s)
 	}
 
@@ -498,7 +496,7 @@ class Branch {
 		const clump = (clumpmax - clumpmin) * r + clumpmin
 		let newdir = V3.normalize(V3.add(V3.scale(adj, 1 - clump), V3.scale(dir, clump)))
 
-		let newdir2 = Branch.mirror(newdir, dir, properties)
+		let newdir2 = Branch.mirror(newdir, dir, properties.branchFactor)
 		if (r > 0.5) {
 			const tmp = newdir
 			newdir = newdir2
