@@ -3,6 +3,7 @@
   "defaultSeverity": "warn",
   "rules": {
     "align": [false],
+    "binary-expression-operand-order": false,
     "export-name": false,
     "function-name": false,
     "import-name": false,
