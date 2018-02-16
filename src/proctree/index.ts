@@ -52,7 +52,7 @@ class Tree {
 		this.normalsTwig = []
 		this.facesTwig = []
 		this.uvsTwig = []
-		this.root.split(undefined, undefined, this.properties, undefined, undefined)
+		this.root.split(this.properties)
 		this.createForks()
 		this.createTwigs()
 		this.doFaces()
@@ -468,11 +468,10 @@ class Branch {
 		return V3(vec.x - v.x * s, vec.y - v.y * s, vec.z - v.z * s)
 	}
 
-	split (level: number | undefined, steps: number | undefined, properties: TreeProperties, l1: number | undefined, l2: number | undefined) {
-		if (l1 == null) l1 = 1
-		if (l2 == null) l2 = 1
-		if (level == null) level = properties.levels
-		if (steps == null) steps = properties.treeSteps
+	split (
+		properties: TreeProperties, level = properties.levels,
+		steps = properties.treeSteps, l1 = 1, l2 = 1
+	) {
 		const rLevel = properties.levels - level
 		let po: V3
 		if (this.parent) {
@@ -530,11 +529,11 @@ class Branch {
 				)
 				this.child0.type = 'trunk'
 				this.child0.length = this.length * properties.taperRate
-				this.child0.split(level, steps - 1, properties, l1 + 1, l2)
+				this.child0.split(properties, level, steps - 1, l1 + 1, l2)
 			} else {
-				this.child0.split(level - 1, 0, properties, l1 + 1, l2)
+				this.child0.split(properties, level - 1, 0, l1 + 1, l2)
 			}
-			this.child1.split(level - 1, 0, properties, l1, l2 + 1)
+			this.child1.split(properties, level - 1, 0, l1, l2 + 1)
 		}
 	}
 }
