@@ -42,7 +42,7 @@ class Tree {
 		this.properties = Object.assign(
 			{rseed: data.seed != null ? data.seed : defaults.seed}, defaults, data
 		)
-		this.root = new (Branch as any)(V3(0, this.properties.trunkLength, 0))
+		this.root = new Branch(V3(0, this.properties.trunkLength, 0))
 		this.root.length = this.properties.initialBranchLength
 		this.verts = []
 		this.faces = []
@@ -220,13 +220,13 @@ class Tree {
 					V3.sub(branch.parent!.child1!.head, branch.parent!.head)
 				)
 			)
-			const binormal = V3.normalize(V3.sub(branch.head,branch.parent!.head))
+			const binormal = V3.normalize(V3.sub(branch.head, branch.parent!.head))
 			let normal = V3.cross(tangent, binormal)
 
 			const vert1 = vertsTwig.length
 			vertsTwig.push(
 				V3.add(
-					V3.add(branch.head, V3.scale(tangent,this.properties.twigScale)),
+					V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)),
 					V3.scale(binormal, this.properties.twigScale * 2 - branch.length)
 				)
 			)
