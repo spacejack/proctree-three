@@ -31,7 +31,7 @@ class Tree {
 	root: Branch
 	verts: V3[]
 	normals: V3[]
-	UV: V2[]
+	uvs: V2[]
 	faces: number[][]
 	vertsTwig: V3[]
 	normalsTwig: V3[]
@@ -39,13 +39,15 @@ class Tree {
 	facesTwig: number[][]
 
 	constructor(data: TreeOptions = {}) {
-		this.properties = Object.assign({rseed: data.seed != null ? data.seed : defaults.seed}, defaults, data)
+		this.properties = Object.assign(
+			{rseed: data.seed != null ? data.seed : defaults.seed}, defaults, data
+		)
 		this.root = new (Branch as any)(V3(0, this.properties.trunkLength, 0))
 		this.root.length = this.properties.initialBranchLength
 		this.verts = []
 		this.faces = []
 		this.normals = []
-		this.UV = []
+		this.uvs = []
 		this.vertsTwig = []
 		this.normalsTwig = []
 		this.facesTwig = []
@@ -62,11 +64,11 @@ class Tree {
 		const faces = this.faces
 		const verts = this.verts
 		const allNormals: V3[][] = []
-		for (let i=0; i < verts.length; i++) {
-			allNormals[i] = [];
+		for (let i = 0; i < verts.length; i++) {
+			allNormals[i] = []
 		}
 		for (let i = 0; i < faces.length; i++) {
-			const face=faces[i]
+			const face = faces[i]
 			const norm = V3.normalize(
 				V3.cross(
 					V3.sub(verts[face[1]], verts[face[2]]),
@@ -94,10 +96,10 @@ class Tree {
 		const segments: number = this.properties.segments
 		const faces: number[][] = this.faces
 		const verts: V3[] = this.verts
-		const UV: V2[] = this.UV
+		const uvs: V2[] = this.uvs
 		if (!branch.parent) {
 			for (let i = 0; i < verts.length; i++) {
-				UV[i] = V2(0, 0)
+				uvs[i] = V2(0, 0)
 			}
 			const tangent = V3.normalize(
 				V3.cross(
@@ -118,12 +120,12 @@ class Tree {
 				const v4 = branch.ring0![(i + 1) % segments]
 				faces.push([v1, v4, v3])
 				faces.push([v4, v2, v3])
-				UV[(i + segOffset) % segments] = V2(Math.abs(i / segments - 0.5) * 2, 0)
+				uvs[(i + segOffset) % segments] = V2(Math.abs(i / segments - 0.5) * 2, 0)
 				const len = V3.len(
 					V3.sub(verts[branch.ring0![i]], verts[branch.root![(i + segOffset) % segments]])
 				) * this.properties.vMultiplier
-				UV[branch.ring0![i]] = V2(Math.abs(i / segments - 0.5) * 2, len)
-				UV[branch.ring2![i]] = V2(Math.abs(i / segments - 0.5) * 2, len)
+				uvs[branch.ring0![i]] = V2(Math.abs(i / segments - 0.5) * 2, len)
+				uvs[branch.ring2![i]] = V2(Math.abs(i / segments - 0.5) * 2, len)
 			}
 		}
 
@@ -161,24 +163,28 @@ class Tree {
 				let r4 = branch.child0!.ring0![(i + 1) % segments]
 				faces.push([r1, r4, r3])
 				faces.push([r4, r2, r3])
-				r1 = branch.child1!.ring0![i];
+				r1 = branch.child1!.ring0![i]
 				r2 = branch.ring2![(i + segOffset1! + 1) % segments]
 				r3 = branch.ring2![(i + segOffset1!) % segments]
 				r4 = branch.child1!.ring0![(i + 1) % segments]
 				faces.push([r1, r2, r3])
 				faces.push([r1, r4, r2])
 
-				const len1 = V3.len(V3.sub(verts[branch.child0!.ring0![i]], verts[branch.ring1![(i + segOffset0!) % segments]])) * uvScale
-				const uv1 = UV[branch.ring1![(i + segOffset0! - 1) % segments]]
+				const len1 = V3.len(
+					V3.sub(verts[branch.child0!.ring0![i]], verts[branch.ring1![(i + segOffset0!) % segments]])
+				) * uvScale
+				const uv1 = uvs[branch.ring1![(i + segOffset0! - 1) % segments]]
 
-				UV[branch.child0!.ring0![i]] = V2(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
-				UV[branch.child0!.ring2![i]] = V2(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
+				uvs[branch.child0!.ring0![i]] = V2(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
+				uvs[branch.child0!.ring2![i]] = V2(uv1.x, uv1.y + len1 * this.properties.vMultiplier)
 
-				const len2 = V3.len(V3.sub(verts[branch.child1!.ring0![i]], verts[branch.ring2![(i + segOffset1!) % segments]])) * uvScale
-				const uv2 = UV[branch.ring2![(i + segOffset1! - 1) % segments]]
+				const len2 = V3.len(
+					V3.sub(verts[branch.child1!.ring0![i]], verts[branch.ring2![(i + segOffset1!) % segments]])
+				) * uvScale
+				const uv2 = uvs[branch.ring2![(i + segOffset1! - 1) % segments]]
 
-				UV[branch.child1!.ring0![i]] = V2(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
-				UV[branch.child1!.ring2![i]] = V2(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
+				uvs[branch.child1!.ring0![i]] = V2(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
+				uvs[branch.child1!.ring2![i]] = V2(uv2.x, uv2.y + len2 * this.properties.vMultiplier)
 			}
 
 			this.doFaces(branch.child0)
@@ -188,9 +194,13 @@ class Tree {
 				faces.push([branch.child0!.end!, branch.ring1![(i + 1) % segments], branch.ring1![i]])
 				faces.push([branch.child1!.end!, branch.ring2![(i + 1) % segments], branch.ring2![i]])
 				let len = V3.len(V3.sub(verts[branch.child0!.end!], verts[branch.ring1![i]]))
-				UV[branch.child0!.end!] = V2(Math.abs(i / segments - 1 - 0.5) * 2, len * this.properties.vMultiplier)
+				uvs[branch.child0!.end!] = V2(
+					Math.abs(i / segments - 1 - 0.5) * 2, len * this.properties.vMultiplier
+				)
 				len = V3.len(V3.sub(verts[branch.child1!.end!], verts[branch.ring2![i]]))
-				UV[branch.child1!.end!] = V2(Math.abs(i / segments - 0.5) * 2, len * this.properties.vMultiplier)
+				uvs[branch.child1!.end!] = V2(
+					Math.abs(i / segments - 0.5) * 2, len * this.properties.vMultiplier
+				)
 			}
 		}
 	}
@@ -214,22 +224,62 @@ class Tree {
 			let normal = V3.cross(tangent, binormal)
 
 			const vert1 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent,this.properties.twigScale)), V3.scale(binormal, this.properties.twigScale * 2 - branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent,this.properties.twigScale)),
+					V3.scale(binormal, this.properties.twigScale * 2 - branch.length)
+				)
+			)
 			const vert2 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)), V3.scale(binormal, this.properties.twigScale * 2 - branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)),
+					V3.scale(binormal, this.properties.twigScale * 2 - branch.length)
+				)
+			)
 			const vert3 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)), V3.scale(binormal, -branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)),
+					V3.scale(binormal, -branch.length)
+				)
+			)
 			const vert4 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)), V3.scale(binormal, -branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)),
+					V3.scale(binormal, -branch.length)
+				)
+			)
 
 			const vert8 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)), V3.scale(binormal, this.properties.twigScale * 2 - branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)),
+					V3.scale(binormal, this.properties.twigScale * 2 - branch.length)
+				)
+			)
 			const vert7 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)), V3.scale(binormal, this.properties.twigScale * 2 - branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)),
+					V3.scale(binormal, this.properties.twigScale * 2 - branch.length)
+				)
+			)
 			const vert6 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)), V3.scale(binormal, -branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, -this.properties.twigScale)),
+					V3.scale(binormal, -branch.length)
+				)
+			)
 			const vert5 = vertsTwig.length
-			vertsTwig.push(V3.add(V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)), V3.scale(binormal, -branch.length)))
+			vertsTwig.push(
+				V3.add(
+					V3.add(branch.head, V3.scale(tangent, this.properties.twigScale)),
+					V3.scale(binormal, -branch.length)
+				)
+			)
 
 			facesTwig.push([vert1, vert2, vert3])
 			facesTwig.push([vert4, vert1, vert3])
@@ -237,8 +287,18 @@ class Tree {
 			facesTwig.push([vert6, vert7, vert8])
 			facesTwig.push([vert6, vert8, vert5])
 
-			normal = V3.normalize(V3.cross(V3.sub(vertsTwig[vert1], vertsTwig[vert3]), V3.sub(vertsTwig[vert2], vertsTwig[vert3])))
-			const normal2 = V3.normalize(V3.cross(V3.sub(vertsTwig[vert7], vertsTwig[vert6]), V3.sub(vertsTwig[vert8], vertsTwig[vert6])))
+			normal = V3.normalize(
+				V3.cross(
+					V3.sub(vertsTwig[vert1], vertsTwig[vert3]),
+					V3.sub(vertsTwig[vert2], vertsTwig[vert3])
+				)
+			)
+			const normal2 = V3.normalize(
+				V3.cross(
+					V3.sub(vertsTwig[vert7], vertsTwig[vert6]),
+					V3.sub(vertsTwig[vert8], vertsTwig[vert6])
+				)
+			)
 
 			normalsTwig.push(normal)
 			normalsTwig.push(normal)
@@ -277,8 +337,8 @@ class Tree {
 			radius = branch.length
 		}
 
-		const verts: V3[] = this.verts
-		const segments: number = this.properties.segments
+		const verts = this.verts
+		const segments = this.properties.segments
 		const segmentAngle = Math.PI * 2 / segments
 		let axis = V3()
 
@@ -340,15 +400,15 @@ class Tree {
 			const linch1 = verts.length
 			ring0.push(linch1)
 			ring1.push(linch1)
-			verts.push(V3.add(centerloc, V3.scale(tangent, -radius*scale)))
+			verts.push(V3.add(centerloc, V3.scale(tangent, -radius * scale)))
 			for (let i = segments / 2 + 1; i < segments; i++) {
 				const v = V3.axisAngle(tangent, axis1, segmentAngle * i)
 				ring0.push(verts.length)
 				ring1.push(verts.length)
 				verts.push(V3.add(centerloc, V3.scale(v, radius * scale)))
 			}
-			ring1.push(linch0);
-			ring2.push(linch1);
+			ring1.push(linch0)
+			ring2.push(linch1)
 			start = verts.length - 1
 			for (let i = 1; i < segments / 2; i++) {
 				const vec = V3.axisAngle(tangent, axis3, segmentAngle * i)
@@ -437,7 +497,7 @@ class Branch {
 		}
 
 		const clump = (clumpmax - clumpmin) * r + clumpmin
-		let newdir = V3.normalize(V3.add(V3.scale(adj, 1-clump), V3.scale(dir, clump)))
+		let newdir = V3.normalize(V3.add(V3.scale(adj, 1 - clump), V3.scale(dir, clump)))
 
 		let newdir2 = Branch.mirror(newdir, dir, properties)
 		if (r > 0.5) {
@@ -469,7 +529,7 @@ class Branch {
 					V3((r - 0.5) * 2 * properties.trunkKink, properties.climbRate, (r - 0.5) * 2 * properties.trunkKink)
 				)
 				this.child0.type = 'trunk'
-				this.child0.length = this.length*properties.taperRate
+				this.child0.length = this.length * properties.taperRate
 				this.child0.split(level, steps - 1, properties, l1 + 1, l2)
 			} else {
 				this.child0.split(level - 1, 0, properties, l1 + 1, l2)
@@ -506,7 +566,7 @@ function V3 (x = 0, y = 0, z = 0) {
 }
 
 namespace V3 {
-	export function dot (v1: V3, v2: V3){
+	export function dot (v1: V3, v2: V3) {
 		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
 	}
 
